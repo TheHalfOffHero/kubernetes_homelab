@@ -2,7 +2,7 @@ variable "pm_user" {
   description = "The username for the proxmox user"
   type        = string
   sensitive   = false
-  default     = "terraform-prov"
+  default     = "terraform-prov@pve"
 
 }
 variable "pm_password" {
@@ -38,18 +38,18 @@ variable "pvt_key" {
 
 variable "num_masters" {
   description = "Enter the number of Master VMs you want"
-  default = 2
+  default     = 2
 }
 
 variable "num_masters_mem" {
   description = "Enter the value for the amount of RAM for your masters. ie. 4096"
-  default = "4096"
+  default     = "4096"
 }
 
 variable "master_disk_size" {
   description = "Enter the size of your Master node disks ie. 80G"
   type        = string
-  default     = "10"
+  default     = "10G"
 }
 
 variable "master_disk_type" {
@@ -66,18 +66,18 @@ variable "master_disk_location" {
 
 variable "num_nodes" {
   description = "Enter the number of VMs you want for worker nodes."
-  default = 3
+  default     = 3
 }
 
 variable "num_nodes_mem" {
   description = "Enter the value for the amount of RAM for your worker nodes. ie. 2048"
-  default = "2048"
+  default     = "2048"
 }
 
 variable "node_disk_size" {
   description = "Enter the size of your Master node disks ie. 80G"
   type        = string
-  default     = "10"
+  default     = "10G"
 }
 
 variable "node_disk_type" {
@@ -101,7 +101,7 @@ variable "template_vm_name" {
 variable "master_ips" {
   description = "List of ip addresses for master nodes"
   type        = list(string)
-  default     = [
+  default = [
     "192.168.1.40",
     "192.168.1.41"
   ]
@@ -110,7 +110,7 @@ variable "master_ips" {
 variable "worker_ips" {
   description = "List of ip addresses for worker nodes"
   type        = list(string)
-  default     = [  
+  default = [
     "192.168.1.50",
     "192.168.1.51",
     "192.168.1.52"
@@ -119,10 +119,10 @@ variable "worker_ips" {
 
 variable "networkrange" {
   description = "Enter as 8,16,22,24,etc. hint: 10.0.0.0/8"
-  default = "192.168.1.0/24"
+  default     = "24"
 }
 
 variable "gateway" {
   description = "Enter your network gateway."
-  default = "192.168.1.1"
+  default     = "192.168.1.1"
 }

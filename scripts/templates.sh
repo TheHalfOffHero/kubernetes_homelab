@@ -38,6 +38,9 @@ function create_template() {
     #qm set $1 --cipassword password
     #Add the user
     qm set $1 --ciuser ${username}
+
+    #enabling the qemu guest agent I think
+    qm set $1 --agent 1
     #Resize the disk to 8G, a reasonable minimum. You can expand it more later.
     #If the disk is already bigger than 8G, this will fail, and that is okay.
     qm disk resize $1 scsi0 8G
