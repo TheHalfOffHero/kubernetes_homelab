@@ -1,6 +1,6 @@
 # Local .terraform directories
 **/.terraform/*
-
+terraform-plugin-proxmox.log
 # .tfstate files
 *.tfstate
 *.tfstate.*

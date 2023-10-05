@@ -6,6 +6,8 @@
 # vm_name
 # file name in the current directory
 function create_template() {
+    echo "Trying to install qemu-guest-agent on image $2"
+    virt-customize -a $2 --install qemu-guest-agent
     #Print all of the configuration
     echo "Creating template $2 ($1)"
 
