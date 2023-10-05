@@ -1,3 +1,7 @@
+/*
+    General Proxmox Vars
+*/
+
 variable "pm_user" {
   description = "The username for the proxmox user"
   type        = string
@@ -36,8 +40,12 @@ variable "pvt_key" {
   default     = "none"
 }
 
+
+/*
+    Master/Controller Vars
+*/
 variable "num_masters" {
-  description = "Enter the number of Master VMs you want"
+  description = "Enter the number of Master/controller VMs you want"
   default     = 3
 }
 
@@ -63,6 +71,10 @@ variable "master_disk_location" {
   type        = string
   default     = "local-lvm"
 }
+
+/*
+    General Proxmox Vars
+*/
 
 variable "num_nodes" {
   description = "Enter the number of VMs you want for worker nodes."
