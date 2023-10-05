@@ -37,7 +37,7 @@ function create_template() {
     qm set $1 --sshkeys ${ssh_keyfile}
     #If you want to do password-based auth instaed
     #Then use this option and comment out the line above
-    #qm set $1 --cipassword password
+    qm set $1 --cipassword password
     #Add the user
     qm set $1 --ciuser ${username}
 
