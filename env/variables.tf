@@ -38,7 +38,7 @@ variable "pvt_key" {
 
 variable "num_masters" {
   description = "Enter the number of Master VMs you want"
-  default     = 2
+  default     = 3
 }
 
 variable "num_masters_mem" {
@@ -103,7 +103,8 @@ variable "master_ips" {
   type        = list(string)
   default = [
     "192.168.1.40",
-    "192.168.1.41"
+    "192.168.1.41",
+    "192.168.1.42"
   ]
 }
 
