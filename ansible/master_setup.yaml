@@ -1,0 +1,8 @@
+---
+- name: Master Setup
+  hosts: masters
+  become: yes
+
+  tasks:
+  - name: checking access
+    ping:

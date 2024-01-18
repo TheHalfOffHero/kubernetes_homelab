@@ -25,7 +25,7 @@ variable "pm_tls_insecure" {
 variable "pm_host" {
   description = "The hostname or IP of the proxmox server"
   type        = string
-  default     = "proxmox"
+  default     = "192.168.1.241"
 }
 
 variable "pm_node_name" {
