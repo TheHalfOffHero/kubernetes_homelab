@@ -1,0 +1,113 @@
+---
+- name: Node Setup
+  hosts: 192.168.1.40
+  gather_facts: yes
+  become: yes
+
+  tasks:
+  - name: checking access
+    ping:
+
+  - name: check if node is already connected to cluster
+    shell: |
+      kubectl get nodes | grep -w controller-0
+    register: node_status
+    ignore_errors: true
+
+  - name: initialize cluster with controller-0 as primary controller
+    shell: |
+      kubeadm init --control-plane-endpoint=192.168.1.40 --node-name controller-0 --pod-network-cidr=10.244.0.0/16
+    run_once: true
+    when: "'controller-0' not in node_status.stdout"
+    
+  - name: copy kube config to user home directory
+    shell: |
+      mkdir -p $HOME/.kube
+      cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+      chown $(id -u):$(id -g) $HOME/.kube/config
+    run_once: true
+
+  - name: get kubeadm join command for worker nodes
+    shell: |
+      kubeadm token create --print-join-command
+    register: join_command_worker
+
+  - name: get kubeadm join command for controller nodes
+    shell: |
+      echo $(kubeadm token create --print-join-command) --control-plane --certificate-key $(kubeadm init phase upload-certs --upload-certs | grep -vw -e certificate -e Namespace)
+    register: join_command_controller
+
+  - name: persist vars between plays
+    set_fact:
+      join_worker: "{{ join_command_worker.stdout }}"
+      join_controller: "{{ join_command_controller.stdout }}"
+      node_status: "{{ node_status.stdout }}"
+    delegate_to: localhost
+
+  - debug:
+      var: join_command_controller.stdout, join_command_worker.stdout
+
+
+
+
+- name: Joining controller Nodes to cluster
+  hosts: secondaryController
+  gather_facts: yes
+  become: yes
+
+  tasks:
+  - name: checking access
+    ping:
+
+  - name: copy kube config to user home directory
+    shell: |
+      mkdir -p $HOME/.kube
+      cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+      chown $(id -u):$(id -g) $HOME/.kube/config
+
+  - name: check if node is already connected to cluster
+    shell: |
+      kubectl get nodes | grep -w controller-1
+    register: node_status
+    ignore_errors: true
+
+  - name: join controller nodes to cluster
+    shell: "{{ hostvars['192.168.1.40'].join_controller }}"
+    when: "'controller' not in node_status.stdout"
+
+  - debug:
+      var: "{{ hostvars['192.168.1.40'].join_controller }}"
+
+
+
+
+- name: Joining worker Nodes to cluster
+  hosts: workers
+  gather_facts: yes
+  become: yes
+
+  tasks:
+  - name: checking access
+    ping:
+
+  - name: join worker nodes to cluster
+    shell: "{{ hostvars['192.168.1.40'].join_worker }}"
+    when: "'controller-0' not in hostvars['192.168.1.40'].node_status"
+
+  - debug:
+      var: "{{ hostvars['192.168.1.40'].join_worker }}"
+
+
+- name: Node Setup
+  hosts: 192.168.1.40
+  gather_facts: yes
+  become: yes
+
+  tasks:
+  - name: checking access
+    ping:
+
+  - name: apply overlay network
+    shell: |
+      kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+    run_once: true

@@ -1,0 +1,59 @@
+---
+- name: Node Setup
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: checking access
+    ping:
+
+  - name: installing docker
+    apt:
+      name: containerd
+      update_cache: true
+      state: present
+
+  - name: setting up directories
+    file:
+      path: /etc/containerd
+      state: directory
+      mode: 0755
+      owner: root
+      group: root
+
+  - name: default all node config
+    shell: |
+      containerd config default > /etc/containerd/config.toml
+      sed -i "s/SystemdCgroup = false/SystemdCgroup = true/" /etc/containerd/config.toml
+      sed -i "s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/" /etc/sysctl.conf
+      echo br_netfilter >> /etc/modules-load.d/k8.conf
+    run_once: true
+  
+  - name: reboot
+    reboot:
+
+  - name: Wait 120 seconds for the machine to reboot
+    wait_for_connection:
+      delay: 5
+      timeout: 120
+
+  - name: adding gpg key for kubernetes repositories
+    apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      keyring: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+      state: present
+
+  - name: adding kubernetes repositories to apt
+    shell: |
+      echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+    run_once: true
+
+  - name: installing required kubernetes packages
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: true
+    loop:
+      - kubelet
+      - kubeadm
+      - kubectl
