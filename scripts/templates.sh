@@ -59,7 +59,7 @@ function create_template() {
 #on the Proxmox system
 export ssh_keyfile=/etc/pve/priv/authorized_keys
 #Username to create on VM template
-export username=mruiz
+export username=matt.ruiz
 
 #Name of your storage
 export storage=local-lvm
